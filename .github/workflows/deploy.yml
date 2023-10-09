@@ -32,3 +32,22 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/km5-images:latest
+
+
+  deploy-prod:
+    runs-on: ubuntu-latest
+    needs: docker
+    steps:
+      - name: Connect to server using SSH
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            docker stop apiContainer
+            docker rm apiContainer
+            docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/km5-images
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/km5-images
+            docker run -d -p 80:80 -e SERVERPORT=${{ secrets.SERVERPORT }} -e DBUSER=${{ secrets.DBUSER }} -e DBPASS=${{ secrets.DBPASS }} -e DBHOST=${{ secrets.DBHOST }} -e DBPORT=${{ secrets.DBPORT }} -e DBNAME=${{ secrets.DBNAME }} --name apiContainer ${{ secrets.DOCKERHUB_USERNAME }}/km5-images:latest
