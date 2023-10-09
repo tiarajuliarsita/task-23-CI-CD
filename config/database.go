@@ -48,7 +48,6 @@ func InitDBMysql(cfg *AppConfig) *gorm.DB {
 		panic(err)
 	}
 	
-	// initMigrate()
 	return db
 }
 
