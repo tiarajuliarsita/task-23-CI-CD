@@ -8,13 +8,11 @@ import (
 )
 
 func main() {
-	// config.InitDBMysql 	 ()
 	cfg := config.InitConfig()
 	db := config.InitDBMysql(cfg)
 	config.InitMigrate(db)
 	app := echo.New()
 	router.New(app, db)
 
-	// port := cfg.APP_PORT
 	app.Logger.Fatal(app.Start(fmt.Sprintf(":%d", cfg.APP_PORT)))
 }
